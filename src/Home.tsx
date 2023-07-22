@@ -91,7 +91,7 @@ function Home() {
 
         <button
           type="button"
-          className="rounded-3xl  py-6 px-14  text-white bg-red-300 
+          className="rounded-3xl text-2xl py-6 px-14  text-white bg-red-300 
                    hover:bg-red-400"
           onClick={() => {
             if (content === "") {
@@ -105,16 +105,19 @@ function Home() {
       </form>
       {/* <hr className="ms-20 me-20 mt-10" /> */}
 
-      <div className="relative overflow-x-auto mt-10 flex justify-center">
-        <table className="w-4/6 text-left">
-          <tbody>
+      <div className="relative mt-10 flex justify-center mx-auto">
+        <table className="text-left w-4/6 ">
+          <tbody
+            className="overflow-y-scroll flex flex-col items-center justify-between "
+            style={{ height: "70vh" }}
+          >
             {tasks.map((task) => {
               return (
                 <tr
-                  className="bg-transparent border-t dark:border-white  text-white"
+                  className="bg-transparent border-t dark:border-white text-white w-11/12"
                   key={task.id}
                 >
-                  <td className="w-10 px-4 relative" id={task.id}>
+                  <td className="px-4 relative" id={task.id}>
                     <div className="inline-flex items-center">
                       <label
                         className="relative flex cursor-pointer items-center rounded-full p-3"
@@ -149,14 +152,14 @@ function Home() {
                       </label>
                     </div>
                   </td>
-                  <th
+                  <td
                     scope="row"
-                    className=" pr-96 py-4 text-2xl font-medium text-white whitespace-nowrap dark:text-white"
+                    className="w-11/12 pr-7 py-4 text-2xl font-medium text-white  dark:text-white text-ellipsis max-w-xs whitespace-normal break-words"
                   >
                     {task.content}
-                  </th>
+                  </td>
 
-                  <td className="py-4 pr-3 w-1 text-3xl whitespace-nowrap ">
+                  <td className="py-4 pr-3 w-1 text-3xl whitespace-nowrap me-1">
                     <FontAwesomeIcon
                       icon={faPenToSquare}
                       type="button"
@@ -167,10 +170,10 @@ function Home() {
                     />
                   </td>
 
-                  <td className="py-4 pl-3 text-3xl whitespace-nowrap ">
+                  <td className="py-4 pl-3 pr-9 w-10 text-3xl whitespace-nowrap ">
                     <FontAwesomeIcon
                       icon={faTrash}
-                      className="cursor-pointer  hover:text-red-300"
+                      className="cursor-pointer transition ease-in-out hover:text-red-300"
                       onClick={() => {
                         handleDeleteTask(task);
                       }}

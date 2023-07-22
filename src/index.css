@@ -5,3 +5,26 @@
 input[type="text"]:focus ~ .input-text{
     @apply text-red-300 bg-transparent transform -translate-y-6 -translate-x-3;
 }
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+  
+/* Track */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+  
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background-color: #8888887c;
+    border-radius: 10px;
+    transition: all 1.5s linear;
+}
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #888888c0;
+    
+}
+

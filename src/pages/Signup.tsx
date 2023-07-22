@@ -18,7 +18,6 @@ export default function Signup() {
 
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
-  const usernameRef = useRef<HTMLInputElement>(null);
 
   const [validPassword, setValidPassword] = useState(false);
   const [validUsername, setValidUsername] = useState(false);
@@ -62,52 +61,63 @@ export default function Signup() {
   };
 
   const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const email = e.target.value;
-    const length = email.length >= 1;
-    const validEmail = email.match(
+    const emailInput = e.target as HTMLInputElement;
+    const emailValue = e.target.value;
+    const emailWarning = document.getElementById("emailWarning") as HTMLElement;
+
+    const length = emailValue.length >= 1;
+    const emailValid = emailValue.match(
       /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
-    if (length && validEmail) setValidEmail(true);
-    else setValidEmail(false);
+
+    if (emailValid && length) {
+      setValidEmail(true);
+      emailWarning.classList.add("invisible");
+      emailInput.classList.remove("focus:ring-purple-700");
+      emailInput.classList.add("focus:ring-red-300");
+    } else if (emailValue == "") {
+      setValidEmail(false);
+      emailWarning.classList.add("invisible");
+      emailInput.classList.add("focus:ring-purple-700");
+      emailInput.classList.remove("focus:ring-red-300");
+    } else {
+      setValidEmail(false);
+      emailWarning.classList.remove("invisible");
+      emailInput.classList.add("focus:ring-purple-700");
+      emailInput.classList.remove("focus:ring-red-300");
+    }
   };
 
   const handleUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
-    const validUsername = document.getElementById(
-      "validUsername"
+    const usernameWarning = document.getElementById(
+      "usernameWarning"
     ) as HTMLElement;
 
-    const usernameInput = document.getElementById(
-      "username"
-    ) as HTMLInputElement;
+    const usernameInput = e.target as HTMLInputElement;
+    const usernameValue = e.target.value;
 
-    if (!usernameRef.current) return;
-    if (
-      usernameRef.current.value.length >= 4 &&
-      (usernameRef.current.value.match(/^(?=.*[0-9])(?=.*[a-z])([a-z0-9]+)$/) !=
-        null ||
-        usernameRef.current.value.match(/^(?=.*[a-z])([a-z]+)$/i) != null ||
-        usernameRef.current.value.match(/^(?=.*[0-9])([0-9]+)$/i) != null)
-    ) {
-      validUsername.classList.add("invisible");
-      usernameInput?.classList.remove("focus:ring-purple-700");
-      usernameInput?.classList.add("focus:ring-red-300");
+    const length = usernameValue.length >= 4;
+    const usernameValid =
+      usernameValue.match(/^(?=.*[0-9])(?=.*[a-z])([a-z0-9]+)$/) != null ||
+      usernameValue.match(/^(?=.*[a-z])([a-z]+)$/i) != null ||
+      usernameValue.match(/^(?=.*[0-9])([0-9]+)$/i) != null;
+
+    if (usernameValid && length) {
+      setValidUsername(true);
+      usernameWarning.classList.add("invisible");
+      usernameInput.classList.remove("focus:ring-purple-700");
+      usernameInput.classList.add("focus:ring-red-300");
+    } else if (usernameValid && !length) {
+      setValidUsername(false);
+      usernameWarning.classList.add("invisible");
+      usernameInput.classList.add("focus:ring-purple-700");
+      usernameInput.classList.remove("focus:ring-red-300");
     } else {
-      validUsername.classList.remove("invisible");
-      usernameInput?.classList.add("focus:ring-purple-700");
-      usernameInput?.classList.remove("focus:ring-red-300");
+      setValidUsername(false);
+      usernameWarning.classList.remove("invisible");
+      usernameInput.classList.add("focus:ring-purple-700");
+      usernameInput.classList.remove("focus:ring-red-300");
     }
-
-    const username = e.target.value;
-    const length = username.length >= 4;
-
-    const letterAndNum =
-      username.match(/^(?=.*[0-9])(?=.*[a-z])([a-z0-9]+)$/) != null ||
-      username.match(/^(?=.*[a-z])([a-z]+)$/i) != null ||
-      username.match(/^(?=.*[0-9])([0-9]+)$/i) != null;
-
-    if (letterAndNum && length) setValidUsername(true);
-    else setValidUsername(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,15 +204,42 @@ export default function Signup() {
           <label htmlFor="email" className="block font-semibold">
             Email
           </label>
-          <input
-            type="email"
-            placeholder="Email"
-            onChange={(e) => {
-              setEmail(e.target.value);
-              handleEmail(e);
-            }}
-            className="border w-full mb-4 p-2 rounded-3xl h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-2 focus:ring-red-300"
-          />
+          <div className="relative pb-4">
+            <input
+              type="email"
+              placeholder="Email"
+              id="email"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                handleEmail(e);
+              }}
+              className="border w-full p-2 rounded-3xl h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none  focus:ring-2 focus:ring-red-300"
+              onFocus={() => {
+                const emailWarning = document.getElementById(
+                  "emailWarning"
+                ) as HTMLElement;
+                const emailInput = document.getElementById(
+                  "email"
+                ) as HTMLInputElement;
+                if (email == "") {
+                  // emailWarning.classList.remove("invisible");
+                  emailInput.classList.add("focus:ring-purple-700");
+                  emailInput.classList.remove("focus:ring-red-300");
+                }
+              }}
+            />
+            <p
+              className="absolute top-15 invisible text-purple-700 font-semibold pl-1"
+              id="emailWarning"
+            >
+              <FontAwesomeIcon
+                icon={faCircleExclamation}
+                className="aspect-square"
+              />
+
+              <span className=""> Email is not valid</span>
+            </p>
+          </div>
 
           <label htmlFor="username" className="block font-semibold pt-3">
             Username
@@ -218,22 +255,34 @@ export default function Signup() {
                 handleUsername(e);
               }}
               onFocus={() => {
-                const validUsername = document.getElementById(
-                  "validUsername"
+                const usernameWarning = document.getElementById(
+                  "usernameWarning"
                 ) as HTMLElement;
-                const usernameInput = document.getElementById("username");
+                const usernameInput = document.getElementById(
+                  "username"
+                ) as HTMLInputElement;
 
-                if (usernameRef.current?.value == "") {
-                  validUsername.classList.remove("invisible");
-                  usernameInput?.classList.add("focus:ring-purple-700");
-                  usernameInput?.classList.remove("focus:ring-red-300");
+                if (username == "") {
+                  usernameWarning.classList.remove("invisible");
+                  usernameInput.classList.add("focus:ring-purple-700");
+                  usernameInput.classList.remove("focus:ring-red-300");
                 }
               }}
-              ref={usernameRef}
+              onBlur={() => {
+                const usernameWarning = document.getElementById(
+                  "usernameWarning"
+                ) as HTMLElement;
+                const usernameInput = document.getElementById(
+                  "username"
+                ) as HTMLInputElement;
+
+                usernameWarning.classList.add("invisible");
+                usernameInput.classList.remove("focus:ring-purple-700");
+              }}
             />
             <p
               className="absolute top-15 invisible text-purple-700 font-semibold pl-1"
-              id="validUsername"
+              id="usernameWarning"
             >
               <FontAwesomeIcon
                 icon={faCircleExclamation}
