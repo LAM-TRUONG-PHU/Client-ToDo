@@ -8,7 +8,7 @@ interface IProps {
 export default function Body(props: IProps) {
   return (
     <div
-      className={`bg-[url('assets/img/image.png')] h-screen w-full bg-no-repeat bg-cover relative bg-black ${props.className} overflow-hidden flex flex-col h-screen`}
+      className={`bg-[url('assets/img/image.png')] min-h-screen w-full bg-no-repeat bg-cover relative bg-black ${props.className} overflow-hidden flex flex-col `}
     >
       {props.children}
     </div>

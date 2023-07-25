@@ -14,8 +14,9 @@ export default function Login() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    fetch("/api/login", {
+    fetch("https://todoapi-uxe5.onrender.com/api/v2/login", {
       method: "POST",
+      credentials: "include", //send with cookie
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
     }).then((res) => {
@@ -44,7 +45,7 @@ export default function Login() {
               id="username"
               placeholder="Username"
               onChange={(e) => setUsername(e.target.value.trim())}
-              className="border w-full p-2 rounded-3xl h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-2 focus:ring-red-300"
+              className="border w-full p-2 rounded-3xl h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-2 focus:ring-red-300 bg-white bg-opacity-70"
             />
             <label htmlFor="password" className="font-semibold block mt-3">
               Password
@@ -66,7 +67,7 @@ export default function Login() {
                 placeholder="Password"
                 onChange={(e) => setPassword(e.target.value.trim())}
                 onFocus={() => setShowFaEye(true)}
-                className="border w-full p-2 rounded-3xl h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-2 focus:ring-red-300"
+                className="border w-full p-2 rounded-3xl h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-2 focus:ring-red-300 bg-white bg-opacity-70"
               />
               {showFaEye && (
                 <button
@@ -89,7 +90,7 @@ export default function Login() {
             <div className="flex justify-between items-baseline">
               <button
                 type="submit"
-                className="px-14 py-2 text-white bg-red-300 rounded-md mt-10 
+                className="px-14 py-2 text-white bg-red-300 rounded-3xl mt-10 
                    hover:bg-red-400"
               >
                 LOGIN

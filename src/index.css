@@ -1,6 +1,15 @@
+@import url(https://db.onlinewebfonts.com/c/7200c6dd8ac604abe09f5159e53a40c0?family=Mark+Pro);
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body{
+    font-family: "Mark Pro";
+}
+
+#home {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
 
 input[type="text"]:focus ~ .input-text{
     @apply text-red-300 bg-transparent transform -translate-y-6 -translate-x-3;

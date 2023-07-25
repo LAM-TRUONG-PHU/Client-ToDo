@@ -6,16 +6,17 @@ export default function Header() {
   const [isLogged, setIsLogged] = useState(false);
 
   useEffect(() => {
-    fetch("/api/verify", { credentials: "include", method: "POST" }).then(
-      (res) => {
-        res.status === 200 ? setIsLogged(true) : setIsLogged(false);
-      }
-    );
+    fetch("https://todoapi-uxe5.onrender.com/api/v2/verify", {
+      credentials: "include",
+      method: "POST",
+    }).then((res) => {
+      res.status === 200 ? setIsLogged(true) : setIsLogged(false);
+    });
   });
 
   return (
     <>
-      <header className="flex p-4 pl-12 bg-black/[.09] justify-between ">
+      <header className="flex p-4 md:pl-12 pl-4 bg-black/[.09] justify-between ">
         <h1 className="text-center text-4xl text-white ">TODO</h1>
 
         {location.pathname == "/" && !isLogged && (
@@ -34,7 +35,7 @@ export default function Header() {
             className="text-xl text-white hover:text-red-300"
             onClick={() => {
               navigate("/login");
-              fetch("/api/logout", {
+              fetch("https://todoapi-uxe5.onrender.com/api/v2/logout", {
                 credentials: "include",
                 method: "POST",
               }).finally(() => {

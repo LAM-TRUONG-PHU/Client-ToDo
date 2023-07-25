@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-
+const inputStyle = {
+  caretColor: "transparent",
+};
 export default function ActivateAccount() {
   const [token, setToken] = useState("");
 
@@ -10,23 +12,34 @@ export default function ActivateAccount() {
   });
 
   return (
-    <div className="antialiased py-6 sm:w-96 mx-auto text-center relative">
+    <div
+      className="antialiased py-6 sm:w-4/12 mx-auto text-center relative"
+      style={inputStyle}
+    >
       <div className=" bg-white/[.40] rounded-lg  pb-10 mt-7 text-left">
         <div className="h-4 bg-red-300 bg-opacity-50 rounded-t-md "></div>
-        <h1 className="text-center text-4xl font-light mt-4">Sign Up</h1>
-
+        <h1 className="text-center text-4xl mt-4">
+          Please Activate Your Account!
+        </h1>
+        <p className="text-center text-lg mt-4 text-gray-700">
+          Before you can login, you must activate your account by button below
+        </p>
         <button
           type="submit"
           className={
-            "px-8 py-2 text-white  rounded-md mt-10 bg-red-300 hover:bg-red-400 "
+            "flex mx-auto px-8 py-2 text-white  rounded-3xl mt-5 bg-red-300 hover:bg-red-400 "
           }
           onClick={() => {
-            fetch("/api/activate?token=" + token, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }).then((res) => {
+            fetch(
+              "https://todoapi-uxe5.onrender.com/api/v2/activate?token=" +
+                token,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            ).then((res) => {
               if (res.status === 200) {
                 alert("Account activated");
                 window.location.href = "/login";

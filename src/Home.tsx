@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 // Initialization for ES Users
 import { Modal, Ripple, initTE } from "tw-elements";
 initTE({ Modal, Ripple });
@@ -12,6 +13,10 @@ interface ITodo {
   completed: boolean;
 }
 
+const inputStyle = {
+  caretColor: "transparent",
+};
+
 function Home() {
   const [tasks, setTasks] = useState<ITodo[]>([]);
   const [task, setTask] = useState<ITodo>({} as ITodo);
@@ -20,7 +25,7 @@ function Home() {
   const navigate = useNavigate();
 
   function handleAddTask() {
-    fetch("/api/todos", {
+    fetch("https://todoapi-uxe5.onrender.com/api/v2/todos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content }),
@@ -32,7 +37,7 @@ function Home() {
   }
 
   function handleGetTask() {
-    fetch("/api/todos", {
+    fetch("https://todoapi-uxe5.onrender.com/api/v2/todos", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
@@ -45,7 +50,7 @@ function Home() {
   }
 
   function handleDeleteTask(task: ITodo) {
-    fetch("/api/todos", {
+    fetch("https://todoapi-uxe5.onrender.com/api/v2/todos", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ todoIDs: [task.id] }),
@@ -58,7 +63,7 @@ function Home() {
   }
 
   function handleUpdateTask(task: ITodo) {
-    fetch("/api/todos", {
+    fetch("https://todoapi-uxe5.onrender.com/api/v2/todos", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -78,11 +83,14 @@ function Home() {
   }, []);
 
   return (
-    <>
-      <form className="flex justify-center items-center gap-4 pb-3 pt-10">
+    <div id="home" className="">
+      <form
+        id="taskForm"
+        className="flex justify-center items-center gap-4 pb-3 pt-10 mx-2"
+      >
         <input
           type="text"
-          className="block bg-transparent text-white rounded-3xl hover:outline-none focus:outline-none text-2xl font-semibold w-2/5 p-5 border-2 border-white focus:border-2 focus:border-red-300"
+          className="block bg-transparent relative z-10 box-border text-white rounded-3xl hover:outline-none focus:outline-none lg:text-2xl text-lg font-semibold lg:w-2/5 w-5/6 lg:p-5 lg:pl-5 pl-2 border-2 border-white focus:border-2 focus:border-red-300"
           placeholder="Enter New Task"
           onChange={(e) => {
             setContent(e.target.value);
@@ -91,7 +99,8 @@ function Home() {
 
         <button
           type="button"
-          className="rounded-3xl text-2xl py-6 px-14  text-white bg-red-300 
+          style={inputStyle}
+          className="rounded-3xl lg:text-2xl text-lg lg:py-6 py-1 lg:px-14 px-7 text-white bg-red-300 
                    hover:bg-red-400"
           onClick={() => {
             if (content === "") {
@@ -104,11 +113,13 @@ function Home() {
         </button>
       </form>
       {/* <hr className="ms-20 me-20 mt-10" /> */}
-
-      <div className="relative mt-10 flex justify-center mx-auto">
-        <table className="text-left w-4/6 ">
+      <div
+        className="relative mt-10 flex justify-center mx-auto"
+        style={inputStyle}
+      >
+        <table className="text-left lg:w-4/6 w-full">
           <tbody
-            className="overflow-y-scroll flex flex-col items-center justify-between "
+            className="overflow-y-scroll flex flex-col items-center"
             style={{ height: "70vh" }}
           >
             {tasks.map((task) => {
@@ -117,15 +128,16 @@ function Home() {
                   className="bg-transparent border-t dark:border-white text-white w-11/12"
                   key={task.id}
                 >
-                  <td className="px-4 relative" id={task.id}>
+                  <td className="md:px-4 md:pr-0 pr-4 relative" id={task.id}>
                     <div className="inline-flex items-center">
                       <label
-                        className="relative flex cursor-pointer items-center rounded-full p-3"
+                        className="relative flex cursor-pointer items-center rounded-full md:p-3 p-0"
                         htmlFor="checkbox"
                         data-ripple-dark="true"
                       >
                         <input
                           type="checkbox"
+                          style={inputStyle}
                           className="before:content[''] peer relative h-6 w-6 cursor-pointer appearance-none rounded-full border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-gray-400 before:opacity-0 before:transition-opacity checked:border-red-300 checked:bg-red-300 checked:before:bg-red-300 hover:before:opacity-30"
                           checked={task.completed}
                           onChange={() => {
@@ -154,23 +166,24 @@ function Home() {
                   </td>
                   <td
                     scope="row"
-                    className="w-11/12 pr-7 py-4 text-2xl font-medium text-white  dark:text-white text-ellipsis max-w-xs whitespace-normal break-words"
+                    style={inputStyle}
+                    className="w-11/12 lg:pr-7 py-4 lg:text-xl text-lg font-medium text-white  dark:text-white lg:max-w-xs max-w-[100px] whitespace-normal break-words "
                   >
                     {task.content}
                   </td>
 
-                  <td className="py-4 pr-3 w-1 text-3xl whitespace-nowrap me-1">
+                  <td className="py-4 lg:pl-0 pl-5 pr-3 w-1 lg:text-3xl text-2xl whitespace-nowrap me-1">
                     <FontAwesomeIcon
                       icon={faPenToSquare}
                       type="button"
-                      className="cursor-pointer  hover:text-red-300"
+                      className="cursor-pointer transition ease-in-out hover:text-red-300"
                       onClick={() => {
                         setTask(task);
                       }}
                     />
                   </td>
 
-                  <td className="py-4 pl-3 pr-9 w-10 text-3xl whitespace-nowrap ">
+                  <td className="py-4 pl-3 lg:pr-9 pr-0 lg:text-3xl text-2xl whitespace-nowrap ">
                     <FontAwesomeIcon
                       icon={faTrash}
                       className="cursor-pointer transition ease-in-out hover:text-red-300"
@@ -185,7 +198,6 @@ function Home() {
           </tbody>
         </table>
       </div>
-
       {task.content ? (
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
@@ -241,7 +253,7 @@ function Home() {
           <div className="opacity-50 fixed inset-0 z-40 bg-black"></div>
         </>
       ) : null}
-    </>
+    </div>
   );
 }
 

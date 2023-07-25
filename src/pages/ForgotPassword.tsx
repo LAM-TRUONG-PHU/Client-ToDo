@@ -6,7 +6,6 @@ import {
   faTimes,
   faCheck,
   faEyeSlash,
-  faCircleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export default function ForgotPassword() {
@@ -17,7 +16,7 @@ export default function ForgotPassword() {
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
   const [password, setPassword] = useState("");
-  const [validPassword, setValidPassword] = useState(false);
+  // const [validPassword, setValidPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
@@ -66,14 +65,14 @@ export default function ForgotPassword() {
       password.match(/^(?=.*[0-9])(?=.*[a-z])([a-zA-Z0-9]+)$/) != null;
     const length = password.length >= 8;
     const capital = password.match(/[A-Z]/) != null;
-    const avaiPassword =
-      passwordRef.current.value === confirmPasswordRef.current.value;
+    // const avaiPassword =
+    //   passwordRef.current.value === confirmPasswordRef.current.value;
 
-    if (letterAndNum && length && capital && avaiPassword)
-      setValidPassword(true);
-    else {
-      setValidPassword(false);
-    }
+    // if (letterAndNum && length && capital && avaiPassword)
+    //   // setValidPassword(true);
+    // else {
+    //   // setValidPassword(false);
+    // }
 
     if (e.target.id === "confirmPassword") return;
 
@@ -101,7 +100,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="antialiased py-6 sm:max-w-md mx-auto text-center relative">
+    <div className="antialiased py-6 sm:max-w-lg mx-auto text-center relative">
       <div className=" bg-white/[.40] rounded-lg  pb-10 mt-7 text-left">
         <div className="h-4 bg-red-300 bg-opacity-50 rounded-t-md "></div>
         <h1 className="text-center text-4xl font-light mt-4">
@@ -135,13 +134,16 @@ export default function ForgotPassword() {
               className="rounded-3xl h-11 px-3  mt-2 text-white bg-red-300 
                    hover:bg-red-400"
               onClick={() => {
-                fetch("/api/forgot-password", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ email }),
-                }).then((res) => {
+                fetch(
+                  "https://todoapi-uxe5.onrender.com/api/v2/forgot-password",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email }),
+                  }
+                ).then((res) => {
                   if (res.status === 200) {
                     alert("OTP sent. Please check your email");
                   } else {
@@ -277,22 +279,18 @@ export default function ForgotPassword() {
           <div className="w-full">
             <button
               type="button"
-              //   disabled={!validPassword || !validUsername || !validEmail}
-              //   className={`px-8 py-2 text-white  rounded-md mt-10
-              //   ${
-              //     validPassword && validUsername && validEmail
-              //       ? "bg-red-300 hover:bg-red-400"
-              //       : "bg-gray-300"
-              //   }`}
-              className="px-8 py-2 text-white rounded-md mt-10 bg-red-300 hover:bg-red-400 flex mx-auto "
+              className="px-8 py-2 text-white rounded-3xl mt-10 bg-red-300 hover:bg-red-400 flex mx-auto "
               onClick={() => {
-                fetch("/api/reset-password", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ email, password, otp }),
-                }).then((res) => {
+                fetch(
+                  "https://todoapi-uxe5.onrender.com/api/v2/reset-password",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email, password, otp }),
+                  }
+                ).then((res) => {
                   if (res.status === 200) {
                     navigate("/login");
                     alert("Password reset successful");
@@ -302,8 +300,11 @@ export default function ForgotPassword() {
                 });
               }}
             >
-              CREATE ACCOUNT
+              CONTINUE
             </button>
+          </div>
+          <div className="flex justify-center pt-5 text-red-300 font-semibold hover:text-red-400">
+            <a href="/login">BACK TO LOGIN</a>
           </div>
         </form>
       </div>
