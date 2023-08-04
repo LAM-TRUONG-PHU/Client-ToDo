@@ -7,8 +7,8 @@ import SuccessfulSignup from "./pages/SuccessfulSignup.tsx";
 import ActivateAccount from "./pages/ActivateAccount.tsx";
 import ForgotPassword from "./pages/ForgotPassword.tsx";
 
-import Header from "./assets/components/Header.tsx";
-import Body from "./assets/components/Body.tsx";
+import Header from "./components/Header.tsx";
+import Body from "./components/Body.tsx";
 import "./index.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
@@ -16,6 +16,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <BrowserRouter>
     <Body>
       <Header />
+
       <main>
         <Routes>
           <Route path="/" element={<Home />} />

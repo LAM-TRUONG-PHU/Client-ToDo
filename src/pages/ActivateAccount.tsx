@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
+import Popup from "../components/Popup";
+import { usePopupStore } from "../store/PopupStore";
+
 const inputStyle = {
   caretColor: "transparent",
 };
 export default function ActivateAccount() {
   const [token, setToken] = useState("");
+  const { isPopupOpen, setIsPopupOpen } = usePopupStore();
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -39,18 +43,20 @@ export default function ActivateAccount() {
                   "Content-Type": "application/json",
                 },
               }
-            ).then((res) => {
+            ).then(async (res) => {
+              const json = await res.json();
               if (res.status === 200) {
-                alert("Account activated");
+                setIsPopupOpen("Account activated");
                 window.location.href = "/login";
-              } else {
-                alert("Invalid token");
+              } else if (res.status >= 400) {
+                setIsPopupOpen(json.message);
               }
             });
           }}
         >
           ACTIVATE
         </button>
+        {isPopupOpen && <Popup message={isPopupOpen} />}
       </div>
     </div>
   );

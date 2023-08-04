@@ -1,9 +1,10 @@
 import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import Popup from "../components/Popup";
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { usePopupStore } from "../store/PopupStore";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -29,7 +30,7 @@ const inputStyle2 = {
 function EmailWarning({ message }: { message: string }) {
   return (
     <p
-      className="absolute top-15 text-purple-700 font-semibold pl-1"
+      className="absolute top-15 text-purple-700 font-medium pl-1"
       id="emailWarning"
     >
       <FontAwesomeIcon icon={faCircleExclamation} className="aspect-square" />
@@ -42,7 +43,7 @@ function EmailWarning({ message }: { message: string }) {
 function UsernameWarning({ message }: { message: string }) {
   return (
     <p
-      className="absolute top-15 text-purple-700 font-semibold pl-1"
+      className="absolute top-15 text-purple-700 font-medium pl-1"
       id="usernameWarning"
     >
       <FontAwesomeIcon icon={faCircleExclamation} className="aspect-square" />
@@ -71,6 +72,8 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [suggestUsername, setSuggestUsername] = useState<string[]>([]);
+
+  const { isPopupOpen, setIsPopupOpen } = usePopupStore();
   // if valid
   const valid = (item: string, v_icon: string, inv_icon: string) => {
     let text = document.getElementById(item) as HTMLInputElement;
@@ -151,8 +154,7 @@ export default function Signup() {
     const usernameValue = e.target.value;
     const length = usernameValue.length >= 4;
     const usernameValid =
-      usernameValue.match(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/) !=
-        null ||
+      usernameValue.match(/^(?=.*[0-9])(?=.*[a-z])([a-z0-9]+)$/) != null ||
       usernameValue.match(/^(?=.*[a-z])([a-z]+)$/i) != null ||
       usernameValue.match(/^(?=.*[0-9])([0-9]+)$/i) != null;
 
@@ -277,10 +279,8 @@ export default function Signup() {
         } else if (res.status == 409) {
           setWarningMessage(json.message);
           setSuggestUsername(json.data);
-        } else if (res.status == 500) {
-          alert("Something went wrong");
-        } else if (res.status == 400) {
-          alert("Please check your information");
+        } else {
+          setIsPopupOpen(json.message);
         }
       });
     }
@@ -295,8 +295,11 @@ export default function Signup() {
         <div className="h-4 bg-red-300 bg-opacity-50 rounded-t-md "></div>
         <h1 className="text-center text-4xl font-light mt-4">Create Account</h1>
 
-        <form className="px-8 py-6" onSubmit={handleSubmit}>
-          <label htmlFor="email" className="block font-semibold">
+        <form
+          className="px-8 py-6 text-sm md:text-base"
+          onSubmit={handleSubmit}
+        >
+          <label htmlFor="email" className="block font-medium">
             Email
           </label>
           <div className="relative pb-4">
@@ -331,7 +334,7 @@ export default function Signup() {
             )}
           </div>
 
-          <label htmlFor="username" className="block font-semibold pt-3">
+          <label htmlFor="username" className="block font-medium mt-3">
             Username
           </label>
           <div className="relative pb-4">
@@ -371,7 +374,7 @@ export default function Signup() {
                   as="div"
                   className="absolute inline-block text-left right-0"
                 >
-                  <div className="group inline-flex w-full justify-center gap-x-1 rounded-3xl px-2 font-semibold text-gray-700 hover:text-opacity-100 text-opacity-60 group-hover:bg-gray-100 group-hover:text-black">
+                  <div className="group inline-flex w-full justify-center gap-x-1 rounded-3xl px-2 font-medium text-gray-700 hover:text-opacity-100 text-opacity-60 group-hover:bg-gray-100 group-hover:text-black">
                     <Menu.Button>
                       <div className="flex">
                         Suggested Usernames
@@ -459,14 +462,12 @@ export default function Signup() {
             </div>
           </div>
 
-          <label htmlFor="password" className="font-semibold block mt-3">
+          <label htmlFor="password" className="font-medium block mt-3">
             Password
           </label>
           <div
             className="relative pb-4"
             onBlur={(e) => {
-              console.log(e.relatedTarget?.className);
-
               if (
                 e.relatedTarget == null ||
                 !e.relatedTarget.className.includes("ltp")
@@ -505,7 +506,7 @@ export default function Signup() {
             {showFaEye && (
               <button
                 type="button"
-                className="absolute right-5 top-1/4 ltp"
+                className="absolute right-5 top-[1.15rem] ltp"
                 onClick={handleShowHide}
               >
                 {showPassword ? (
@@ -517,7 +518,7 @@ export default function Signup() {
             )}
           </div>
           {/* Password is at least 8 characters long */}
-          <p className="text-gray-600 font-semibold pt-2" id="long">
+          <p className="text-gray-600 font-medium pt-2" id="long">
             <FontAwesomeIcon
               icon={faTimes}
               className="fa-times icon absolute  aspect-square text-center border-2 border-gray-600 rounded-full"
@@ -529,7 +530,7 @@ export default function Signup() {
             <span className="ml-6">Password is at least 8 characters long</span>
           </p>
           {/* Password contains at least one letter or number */}
-          <p className="text-gray-600 font-semibold pt-2" id="length">
+          <p className="text-gray-600 font-medium pt-2" id="length">
             <FontAwesomeIcon
               icon={faTimes}
               className="fa-times icon absolute aspect-square text-center border-2 border-gray-600 rounded-full"
@@ -542,7 +543,7 @@ export default function Signup() {
               Password contains at least one letter or number
             </span>
           </p>
-          <p className="text-gray-600 font-semibold pt-2 pb-4" id="capital">
+          <p className="text-gray-600 font-medium pt-2 pb-4" id="capital">
             <FontAwesomeIcon
               icon={faTimes}
               className="fa-times icon absolute aspect-square text-center border-2 border-gray-600 rounded-full"
@@ -555,7 +556,7 @@ export default function Signup() {
               Password contains at least one Capital letter
             </span>
           </p>
-          <label htmlFor="confirmPassword" className="font-semibold block mt-3">
+          <label htmlFor="confirmPassword" className="font-medium block mt-3">
             Confirm Password
           </label>
           <div
@@ -598,7 +599,7 @@ export default function Signup() {
             {showFaEye && (
               <button
                 type="button"
-                className="absolute right-5 top-1/3"
+                className="absolute right-5 top-[1.15rem]"
                 onClick={handleShowHide}
                 onMouseDown={(e) => {
                   e.stopPropagation();
@@ -626,11 +627,12 @@ export default function Signup() {
               CREATE ACCOUNT
             </button>
           </div>
-          <div className="flex justify-center pt-5 text-red-300 font-semibold hover:text-red-400">
-            <a href="/login">ALREADY HAVE AN ACCOUNT?</a>
+          <div className="flex justify-center mt-5 text-black opacity-70 hover:opacity-100 font-medium ">
+            <Link to="/login">ALREADY HAVE AN ACCOUNT?</Link>
           </div>
         </form>
       </div>
+      {isPopupOpen && <Popup message={isPopupOpen} />}
     </div>
   );
 }

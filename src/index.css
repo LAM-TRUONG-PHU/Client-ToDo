@@ -3,13 +3,15 @@
 @tailwind components;
 @tailwind utilities;
 
-body{
-    font-family: "Mark Pro";
+body, #popup{
+    font-family: "Mark Pro", sans-serif;
 }
 
-#home {
+#home  {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
 }
+
+
 
 input[type="text"]:focus ~ .input-text{
     @apply text-red-300 bg-transparent transform -translate-y-6 -translate-x-3;
@@ -37,3 +39,10 @@ input[type="text"]:focus ~ .input-text{
     
 }
 
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px white  inset;
+}
+
+input:-webkit-autofill:focus{
+    -webkit-box-shadow: 0 0 0 30px white  inset;
+}

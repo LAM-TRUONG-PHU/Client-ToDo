@@ -1,7 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import Popup from "./components/Popup";
+import { usePopupStore } from "./store/PopupStore";
 import { faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 // Initialization for ES Users
 import { Modal, Ripple, initTE } from "tw-elements";
@@ -21,24 +25,49 @@ function Home() {
   const [tasks, setTasks] = useState<ITodo[]>([]);
   const [task, setTask] = useState<ITodo>({} as ITodo);
   const [content, setContent] = useState("");
+  const [showNotification, setShowNotification] = useState<ITodo>({} as ITodo);
+  const { isPopupOpen, setIsPopupOpen } = usePopupStore();
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const navigate = useNavigate();
 
+  const [listRef] = useAutoAnimate<HTMLTableSectionElement>();
+
   function handleAddTask() {
+    const taskInput = document.getElementById("taskInput") as HTMLInputElement;
+    if (content === "") {
+      return;
+    }
     fetch("https://todoapi-uxe5.onrender.com/api/v2/todos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ content }),
-    })
-      .then((res) => res.json())
-      .then(() => {
+    }).then(async (res) => {
+      const json = await res.json();
+      if (res.status >= 400) {
+        setIsPopupOpen(json.message);
+      } else {
         handleGetTask();
-      });
+        setContent("");
+      }
+      taskInput.value = "";
+    });
   }
+
+  // useEffect(() => {
+  //   const taskInput = document.getElementById("taskInput") as HTMLInputElement;
+  //   taskInput.addEventListener("keypress", (e) => {
+  //     if (e.key === "Enter") {
+  //       handleAddTask();
+  //     }
+  //   });
+  // }, []);
 
   function handleGetTask() {
     fetch("https://todoapi-uxe5.onrender.com/api/v2/todos", {
       method: "GET",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
     })
       .then((res) => {
@@ -53,12 +82,12 @@ function Home() {
     fetch("https://todoapi-uxe5.onrender.com/api/v2/todos", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ todoIDs: [task.id] }),
     })
       .then((res) => res.json())
-      .then((data) => {
+      .then(() => {
         handleGetTask();
-        alert(data.message);
       });
   }
 
@@ -66,6 +95,7 @@ function Home() {
     fetch("https://todoapi-uxe5.onrender.com/api/v2/todos", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({
         todo: {
           id: task.id,
@@ -90,24 +120,28 @@ function Home() {
       >
         <input
           type="text"
+          id="taskInput"
+          autoComplete="off"
           className="block bg-transparent relative z-10 box-border text-white rounded-3xl hover:outline-none focus:outline-none lg:text-2xl text-lg font-semibold lg:w-2/5 w-5/6 lg:p-5 lg:pl-5 pl-2 border-2 border-white focus:border-2 focus:border-red-300"
           placeholder="Enter New Task"
           onChange={(e) => {
             setContent(e.target.value);
           }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleAddTask();
+            }
+          }}
         ></input>
 
         <button
           type="button"
+          ref={buttonRef}
           style={inputStyle}
+          onClick={handleAddTask}
           className="rounded-3xl lg:text-2xl text-lg lg:py-6 py-1 lg:px-14 px-7 text-white bg-red-300 
                    hover:bg-red-400"
-          onClick={() => {
-            if (content === "") {
-              return;
-            }
-            handleAddTask();
-          }}
         >
           Add
         </button>
@@ -120,6 +154,7 @@ function Home() {
         <table className="text-left lg:w-4/6 w-full">
           <tbody
             className="overflow-y-scroll flex flex-col items-center"
+            ref={listRef}
             style={{ height: "70vh" }}
           >
             {tasks.map((task) => {
@@ -140,7 +175,7 @@ function Home() {
                           style={inputStyle}
                           className="before:content[''] peer relative h-6 w-6 cursor-pointer appearance-none rounded-full border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-gray-400 before:opacity-0 before:transition-opacity checked:border-red-300 checked:bg-red-300 checked:before:bg-red-300 hover:before:opacity-30"
                           checked={task.completed}
-                          onChange={() => {
+                          onClick={() => {
                             task.completed = !task.completed;
                             handleUpdateTask(task);
                           }}
@@ -176,9 +211,10 @@ function Home() {
                     <FontAwesomeIcon
                       icon={faPenToSquare}
                       type="button"
-                      className="cursor-pointer transition ease-in-out hover:text-red-300"
+                      className="cursor-pointer transition ease-linear hover:text-red-300"
                       onClick={() => {
                         setTask(task);
+                        setContent(task.content);
                       }}
                     />
                   </td>
@@ -186,9 +222,10 @@ function Home() {
                   <td className="py-4 pl-3 lg:pr-9 pr-0 lg:text-3xl text-2xl whitespace-nowrap ">
                     <FontAwesomeIcon
                       icon={faTrash}
-                      className="cursor-pointer transition ease-in-out hover:text-red-300"
+                      className="cursor-pointer transition ease-linear hover:text-red-300"
                       onClick={() => {
-                        handleDeleteTask(task);
+                        setShowNotification(task);
+                        // handleDeleteTask(task);
                       }}
                     />
                   </td>
@@ -198,28 +235,21 @@ function Home() {
           </tbody>
         </table>
       </div>
-      {task.content ? (
+      {task.content || task.content == "" ? (
         <>
-          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+          <div className="justify-center mt-24 flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
-              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white/[.60] outline-none focus:outline-none">
                 {/*header*/}
-                <div className="flex items-start justify-between p-2 border-b border-solid border-slate-200 rounded-t">
-                  <button
-                    className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
-                    onClick={() => setTask({} as ITodo)}
-                  >
-                    <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
-                      x
-                    </span>
-                  </button>
-                </div>
+
+                <div className="flex items-start justify-between  h-6 bg-red-300 bg-opacity-50 rounded-t-lg"></div>
                 {/*body*/}
-                <div className="relative p-6 flex-auto">
+                <div className="relative m-3 px-3 flex-auto">
                   <input
                     type="text"
-                    className="border w-full text-black mb-4 p-2 rounded-3xl h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-2 focus:ring-red-300"
+                    id="inputUpdate"
+                    className="border w-full text-black  p-2 rounded-3xl h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-2 focus:ring-red-300 bg-white opacity-70"
                     defaultValue={task.content}
                     onChange={(e) => {
                       setContent(e.target.value);
@@ -227,21 +257,27 @@ function Home() {
                   ></input>
                 </div>
                 {/*footer*/}
-                <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
+                <div className="flex  mx-6 my-3 rounded-b">
                   <button
-                    className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    className="text-white hover:text-red-300 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
                     onClick={() => setTask({} as ITodo)}
                   >
                     Close
                   </button>
                   <button
-                    className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    disabled={content == ""}
+                    className={`${
+                      content == ""
+                        ? "bg-gray-300"
+                        : "bg-red-300 active:bg-red-400 "
+                    }text-white  font-bold uppercase text-sm px-6 py-3 rounded-3xl shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150`}
                     type="button"
                     onClick={() => {
-                      setTask({} as ITodo);
                       task.content = content;
+                      if (task.content == "") return;
                       handleUpdateTask(task);
+                      setTask({} as ITodo);
                     }}
                   >
                     Save Changes
@@ -253,6 +289,56 @@ function Home() {
           <div className="opacity-50 fixed inset-0 z-40 bg-black"></div>
         </>
       ) : null}
+
+      {showNotification.content || showNotification.content == "" ? (
+        <>
+          <div className="justify-center mt-24 flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white/[.60] outline-none focus:outline-none">
+                {/*header*/}
+
+                <div className="relative flex items-start h-6 bg-red-300 bg-opacity-50 rounded-t-lg ">
+                  <FontAwesomeIcon
+                    icon={faCircleExclamation}
+                    className="aspect-square absolute left-3 top-1 "
+                  />
+                </div>
+                {/*body*/}
+                <div className="relative m-3 px-3 flex-auto">
+                  Are you sure you want to delete{" "}
+                  <span className="font-semibold">
+                    {showNotification.content}
+                  </span>
+                  ?
+                </div>
+                {/*footer*/}
+                <div className="flex items-center justify-end m-6  border-slate-200 rounded-b">
+                  <button
+                    className="text-white hover:text-red-300 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                    onClick={() => setShowNotification({} as ITodo)}
+                  >
+                    Close
+                  </button>
+                  <button
+                    className="bg-red-300 text-white active:bg-red-400 font-bold uppercase text-sm px-6 py-3 rounded-3xl shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                    onClick={() => {
+                      setShowNotification({} as ITodo);
+                      handleDeleteTask(showNotification);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="opacity-50 fixed inset-0 z-40 bg-black"></div>
+        </>
+      ) : null}
+      {isPopupOpen && <Popup message={isPopupOpen} />}
     </div>
   );
 }
